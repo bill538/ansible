@@ -1,4 +1,4 @@
-# cs-patching.yml
+# patching.yml
 ---
   - hosts: all
     become: true
@@ -14,7 +14,7 @@
     tasks:
 
     - name: upgrade all packages
-      yum: name=* state=latest download_only="{{ patches_download_only }}"
+      yum: name=* state=latest
 
     - name: Check for reboot hint.
       shell: LAST_KERNEL=$(rpm -q --last kernel | awk 'NR==1{sub(/kernel-/,""); print $1}'); CURRENT_KERNEL=$(uname -r); if [ $LAST_KERNEL != $CURRENT_KERNEL ]; then echo 'reboot'; else echo 'no'; fi
@@ -30,8 +30,14 @@
       ignore_errors: true
       when: (( reboot_hint.stdout.find("reboot") != -1 and reboot_when_needed ) )
       when: reboot_host|bool
-      when: not patches_download_only|bool
+      # when: not patching_download_only|bool
       register: rebooting
+
+    - debug:
+        msg:
+          - "reboot_host: {{ reboot_host }}"
+          - "reboot_hint.stdout: {{ reboot_hint.stdout }}"
+          - "reboot_when_needed: {{ reboot_when_needed }}"
 
     - name: Waiting {{ reboot_wait_timeout }} seconds, but only start checking host after {{ reboot_wait_delay }} seconds
       wait_for_connection:

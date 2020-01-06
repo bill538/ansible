@@ -1,9 +1,13 @@
 # patching-defaults.yml
 ---
 
-reboot_host: true            # Reboot every time you patch reguardless if needed
-reboot_when_needed: false    # Only reboot host if a kernel update is detected.  Note: reboot_host needs to be set to false
-reboot_wait_timeout: 500     # seconds
-reboot_wait_delay:    75     # seconds
-reboot_delay: 1              # minutes
-patches_download_only: false     #
+pre_task:
+  - set_fact:
+      reboot_host: "{{ reboot_host | default(true) }}"                 # Reboot every time you patch reguardless if needed
+      reboot_when_needed: "{{ reboot_when_needed | default(false) }}"  # Only reboot host if a kernel update is detected.
+                                                                       # Note: reboot_host needs to be set to false
+      reboot_wait_timeout: "{{ reboot_wait_timeout | default(500) }}"  # seconds
+      reboot_wait_delay: "{{ reboot_wait_delay | default(75) }}"       # seconds
+      reboot_delay: "{{ reboot_delay | default(1) }}"                  # minutes
+      patching_download_only: "{{ patching_download_only | default(false) }}"
+    

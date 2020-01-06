@@ -1,0 +1,22 @@
+# patching-download-only.yml
+---
+  - hosts: all
+    become: true
+    gather_facts: false
+
+    vars:
+
+    vars_files:
+      - ../vars/patching-defaults.yml
+      - ../vars/os_depends.yml
+
+    roles:
+
+    tasks:
+      - name: Patching - Downloading package updates
+        yum: 
+          name: '*'
+          state: latest
+          download_only: true
+#          download_only: "{{ patching_download_only }}"
+#        when: patching_download_only|bool == true

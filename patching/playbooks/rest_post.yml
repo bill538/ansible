@@ -19,6 +19,7 @@
     status:
     percent: 0
     patchwindow: 1
+    comment:
     type: "{{ ansible_system_vendor }}"
     hostname: "{{ ansible_hostname }}"
     ipaddr: "{{ ansible_default_ipv4.address }}"
@@ -33,7 +34,7 @@
       timeout: "{{ status_timeout }}"
       headers:
         Content-Type: "application/x-www-form-urlencoded"
-      body: "hostname={{ hostname }}&ipaddr={{ ipaddr }}&uname={{ uname }}&uptime={{ uptime }}&patchwindow={{ patch_window }}&astatus={{ astatus }}&status={{status }}&percent={{ percent }}"
+      body: "hostname={{ hostname }}&ipaddr={{ ipaddr }}&uname={{ uname }}&uptime={{ uptime }}&patchwindow={{ patch_window }}&type={{ type }}&comment={{ comment }}&astatus={{ astatus }}&status={{ status }}&percent={{ percent }}"
     ignore_errors: yes
     register: rest_post
 
