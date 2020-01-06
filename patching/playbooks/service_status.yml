@@ -1,0 +1,33 @@
+# service_status.yml
+---
+
+- name: Service check
+  hosts: all
+  remote_user: vagrant
+  become: true
+  gather_facts: false
+
+  vars:
+    service_list: [ ]
+
+  vars_files:
+    - ../vars/precheck-defaults.yml
+    - ../vars/os_depends.yml
+
+  roles:
+
+  tasks:
+  - name: Service status
+    command: systemctl status "{{ item }}"
+    # ignore_errors: yes
+    failed_when: result.rc != 0
+    changed_when: result.rc != 0
+    with_items: "{{ service_list }}"
+    register: result
+    # no_log: true
+#    when: service_state != 'started' or service_state != 'stopped' or service_state != 'restarted'
+
+#  - name: Service status - DEBUG
+#    debug:
+#      msg: "{{ result }}"
+#    when: result failed

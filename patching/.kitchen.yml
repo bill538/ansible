@@ -1,0 +1,65 @@
+---
+driver:
+  name: vagrant
+  customize:
+    cpus: 1
+    memory: 512
+
+provisioner:
+  name: chef_zero
+  # You may wish to disable always updating cookbooks in CI or other testing environments.
+  # For example:
+  #   always_update_cookbooks: <%= !ENV['CI'] %>
+  always_update_cookbooks: true
+
+verifier:
+  name: inspec
+
+platforms:
+  - name: ubuntu-18.04
+  - name: centos-7
+  - name: generic/rhel7
+
+
+suites:
+  - name: web1
+    vm_hostname: web1.billsnet.com
+    network:
+      - ["public_network", bridge: 'enp0s31f6' ]
+      # - ["private_network", {ip: "3.72.173.19"}]
+    run_list:
+      - recipe[billsnet-nginx::default]
+    verifier:
+      inspec_tests:
+        - test/smoke/default
+    attributes:
+      certbot: 
+        staging: true
+
+  - name: web2
+    vm_hostname: web2.billsnet.com
+    network:
+      - ["public_network", bridge: 'enp0s31f6' ]
+    run_list:
+      - recipe[billsnet-nginx::default]
+    verifier:
+      inspec_tests:
+        - test/smoke/default
+    attributes:
+      certbot:
+        staging: true
+
+  - name: lb1
+    vm_hostname: lb1.billsnet.com
+    network:
+      - ["public_network", bridge: 'enp0s31f6' ]
+
+    run_list:
+      - recipe[billsnet-nginx::default]
+    verifier:
+      inspec_tests:
+        - test/smoke/default
+    attributes:
+      certbot:
+        staging: true
+

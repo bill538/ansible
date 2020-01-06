@@ -1,0 +1,4 @@
+# precheck-defaults.yml
+---
+
+free_space_limit: 1073741824

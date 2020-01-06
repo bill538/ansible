@@ -1,0 +1,35 @@
+# service_check.yml
+---
+
+- name: Service state
+  hosts: all
+  remote_user: vagrant
+  become: true
+  gather_facts: false
+
+  vars:
+    service_state: started
+    service_list: [ ]
+
+  vars_files:
+    - ../vars/precheck-defaults.yml
+    - ../vars/os_depends.yml
+
+  roles:
+
+  tasks:
+  - name: Service state - Changed
+    service:
+      name: "{{ item }}"
+      state: "{{ service_state }}"
+    # ignore_errors: yes
+    # no_log: true
+    with_items: "{{ service_list }}"
+    # when: service_state != 'started' or service_state != 'stopped' or service_state != 'restarted'
+    register: result
+
+#  - name: Service state - DEBUG
+#    debug:
+#      msg: "{{ result }}"
+#    when: result failed
+#    when: debug is defined

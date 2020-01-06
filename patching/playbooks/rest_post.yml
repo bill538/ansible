@@ -1,0 +1,43 @@
+# rest_post.yml
+---
+
+- name: Patching - REST API
+  hosts: all
+  remote_user: vagrant
+  become: true
+  gather_facts: false
+
+  vars:
+    dest_host: 192.168.10.126
+    dest_port: 8000
+    status_dir: cs
+    status_cgi: patching/api/v1/checking
+    status_tries: 1
+    status_timeout: 300
+    patch_window: 1
+    astatus:
+    status:
+    percent: 0
+    patchwindow: 1
+    type: "{{ ansible_system_vendor }}"
+    hostname: "{{ ansible_hostname }}"
+    ipaddr: "{{ ansible_default_ipv4.address }}"
+    uname: "{{ ansible_kernel }}"
+    uptime: "{{ ansible_uptime_seconds }}"
+
+  tasks:
+  - name: Patching - REST API # - http://{{ dest_host }}:{{ dest_port }}/{{ status_dir }}/{{ status_cgi }}
+    uri:
+      url: http://{{ dest_host }}:{{ dest_port }}/{{ status_dir }}/{{ status_cgi }}
+      method: POST
+      timeout: "{{ status_timeout }}"
+      headers:
+        Content-Type: "application/x-www-form-urlencoded"
+      body: "hostname={{ hostname }}&ipaddr={{ ipaddr }}&uname={{ uname }}&uptime={{ uptime }}&patchwindow={{ patch_window }}&astatus={{ astatus }}&status={{status }}&percent={{ percent }}"
+    ignore_errors: yes
+    register: rest_post
+
+  - name: Patching - REST API - DEBUG
+    debug:
+      msg: "{{ rest_post }}"
+    when: rest_post.status != 200

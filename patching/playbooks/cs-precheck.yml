@@ -1,0 +1,43 @@
+# cs-precheck.yml
+---
+
+- name: Patching Precheck
+  hosts: all
+  remote_user: vagrant
+  become: true
+
+  vars:
+    disk_free: true
+
+  vars_files:
+    - ../vars/precheck-defaults.yml
+    - ../vars/os_depends.yml
+
+  roles:
+
+  tasks:
+    - name: Stat /etc/ssh/sshd_config file
+      local_action: stat path="/etc/ssh/sshd_config"
+      register: file
+
+    - name: copy file if it exists
+      copy: src=/etc/ssh/sshd_config dest=/etc/ssh/sshd_config.patching
+      when: file.stat.exists
+
+    - name: Debug free_space_limit
+      debug:
+        msg: "{{ free_space_limit }}"
+
+    - name: Checking for available space to patch host
+      assert:
+        that:
+          - not {{ item.mount == '/' and ( item.size_available < free_space_limit ) }}
+          - not {{ item.mount == '/var' and ( item.size_available < free_space_limit ) }}
+      with_items:
+        - "{{ ansible_mounts }}"
+      #ignore_errors: yes
+      register: disk_free
+
+    - name: Debug disk_free
+      debug:
+        msg: "{{ disk_free }}"

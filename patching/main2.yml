@@ -1,0 +1,32 @@
+# mina2.yml
+---
+
+- name: Begin Patching
+  hosts: all
+  remote_user: vagrant
+  become: true
+  tasks:
+  - name: say hi
+    tags: foo
+    shell: echo "hi..."
+
+- import_playbook: playbooks/service_state.yml
+  vars:
+    serivce_state: started
+    service_list: [ crond ]
+
+- import_playbook: playbooks/rest_post.yml status="Checking host"
+- import_playbook: playbooks/service_status.yml
+  vars:
+    service_list: [ crond ]
+
+- import_playbook: playbooks/service_state.yml
+  vars:
+    service_state: stopped
+    service_list: [ crond ]
+
+
+#- import_playbook: playbooks/cs-precheck.yml
+
+# and if we wanted, we can continue with more includes here,
+# or more plays inline in this file

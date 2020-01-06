@@ -1,0 +1,48 @@
+# main.yml
+---
+- hosts: all
+  become: true
+
+  vars:
+
+  vars_files:
+    - ./vars/patching-defaults.yml
+    - ./vars/os_depends.yml
+
+  roles:
+
+  # Patching Orcistration tasks
+  tasks:
+    - name: Checking in rest api
+      debug:
+        msg: Checking in rest api
+  - import_playbook: ./playbooks/rest_post.yml
+     # percent=0 patchwindow=1
+#      vars:
+      #include_vars:
+#        astatus: Checking host
+#        status: Checking host
+#        percent: 0
+#        patchwindow: 1
+
+# Check OS health for upgrade
+
+# Checking in rest api
+# Download patched
+
+# Checking in rest api
+# Stop any services
+
+# Checking in rest api
+# Patch
+
+# Checking in rest api
+# Reboot server
+
+# Checking in rest api
+# Validate services`
+
+
+#when: ansible_os_family == "Redhat"
+#when: ansible_os_family == "Debian"
+#when: ansible_os_family == "Windows"
