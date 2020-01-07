@@ -1,0 +1,34 @@
+# http_check.yml
+---
+
+- name: Http - Check
+  hosts: all
+  remote_user: vagrant
+  become: true
+  gather_facts: false
+
+  vars:
+    #http_url: http://127.0.0.1:8000/get
+    http_url: http://192.168.10.126:8000/get
+    http_retries: 1 #36
+    http_delay: 1 #10
+    http_timeout: 30
+    http_pattern: '\n'
+  
+  tasks:
+  - name: Http - Check # - http://{{ dest_host }}:{{ dest_port }}/{{ status_dir }}/{{ status_cgi }}
+    uri:
+      url: "{{ http_url }}"
+      method: GET
+      timeout: "{{ http_timeout }}"
+      return_content: yes
+    register: http_get
+    until: http_get.status == 200 and http_get.content.find(http_pattern)
+    #until: http_get.status == 200 and {{ if defined http_get.content.find("{{ http_pattern }}") }}
+    retries:  "{{ http_retries }}"
+    delay: "{{ http_delay }}"
+
+  - name: Patching - REST API - DEBUG
+    debug:
+      msg: "{{ http_get }}"
+    when: http_get.status != 200

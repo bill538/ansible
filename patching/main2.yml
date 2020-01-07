@@ -10,7 +10,7 @@
 #    tags: foo
 #    shell: echo "hi..."
 
-
+# url_username, url_password
 - import_playbook: playbooks/rest_post.yml status="Checking host service" astatus="Checking host service" percent=1
 - import_playbook: playbooks/service_status.yml
   vars:
@@ -33,9 +33,10 @@
 - import_playbook: playbooks/patching.yml reboot_host=false reboot_when_needed=true
 - import_playbook: playbooks/rest_post.yml status="Patching and rebooting host" astatus="Patching and rebooting host" percent=75
 
-- import_playbook: playbooks/rest_post.yml status="Checking host service" astatus="Checking host service" percent=99
+- import_playbook: playbooks/rest_post.yml status="Checking host service" astatus="Checking host service" percent=80
 - import_playbook: playbooks/service_status.yml
   vars:
     service_list: [ crond ]
 
+- import_playbook: playbooks/http_check.yml http_url=http://192.168.10.126:8000/get http_pattern='\n' #http_retries=36 http_delay=10 http_timeout=30
 - import_playbook: playbooks/rest_post.yml status="Rebooted" astatus="Rebooted" percent=100
