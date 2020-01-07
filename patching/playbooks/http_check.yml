@@ -16,7 +16,7 @@
     http_pattern: '\n'
   
   tasks:
-  - name: Http - Check # - http://{{ dest_host }}:{{ dest_port }}/{{ status_dir }}/{{ status_cgi }}
+  - name: Http - Check
     uri:
       url: "{{ http_url }}"
       method: GET
@@ -28,7 +28,7 @@
     retries:  "{{ http_retries }}"
     delay: "{{ http_delay }}"
 
-  - name: Patching - REST API - DEBUG
+  - name: Http - Check - DEBUG
     debug:
       msg: "{{ http_get }}"
     when: http_get.status != 200

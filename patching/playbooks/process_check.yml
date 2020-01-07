@@ -1,0 +1,22 @@
+# process_check.yml
+---
+
+- name: Process - Check
+  hosts: all
+  remote_user: vagrant
+  become: true
+  gather_facts: false
+
+  vars:
+    process_check: crond
+
+  tasks:
+  - name: Process - Check
+    pids:
+      name: "{{ process_check }}"
+    register: pids_list
+
+  - name: Process - Check - DEBUG
+    debug:
+      msg: "{{ pids_list }}"
+    when: pids_list.list == 0
