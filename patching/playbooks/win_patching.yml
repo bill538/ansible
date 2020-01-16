@@ -1,0 +1,19 @@
+# win_patching.yaml
+---
+- name: Patching Windozs host and rebooting
+  hosts: all
+  ansible_port: 5986
+  ansible_connection: winrm
+
+  vars:
+    ansible_connection: winrm
+    ansible_winrm_server_cert_validation: ignore # ignore or validate
+    default_category_names: [ 'Application', 'CriticalUpdates', 'DefinitionUpdates', 'SecurityUpdates', 'Updates' ]
+    default_whitelist: []
+
+  tasks:
+    win_updates:
+      category_names: "{{ winupdate_category_names | default(default_category_names) }}"
+      whitelist: "{{ winupdate_whitelist | default(default_whitelist) }}"
+    reboot: "{{ winupdate_reboot | default(yes) }}"
+    reboot_timeout: "{{ winupdate_reboot_timeout | default(500) }}"
