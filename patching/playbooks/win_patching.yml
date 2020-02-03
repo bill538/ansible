@@ -1,19 +1,47 @@
 # win_patching.yaml
 ---
-- name: Patching Windozs host and rebooting
+- name: Windozs Patching
   hosts: all
-  ansible_port: 5986
-  ansible_connection: winrm
 
   vars:
+    ansible_port: 5986
     ansible_connection: winrm
     ansible_winrm_server_cert_validation: ignore # ignore or validate
-    default_category_names: [ 'Application', 'CriticalUpdates', 'DefinitionUpdates', 'SecurityUpdates', 'Updates' ]
+    default_blacklist: []
     default_whitelist: []
+    default_category_names: [ 'Application', 'CriticalUpdates', 'DefinitionUpdates', 'SecurityUpdates', 'Updates' ]
+    default_state: 'installed'
+    default_server_selection: 'default'    # default, managed_server, windows_update
+    default_log_path: "C:/app/patching/{{ansible_date_time.month}}.log"
+    default_reboot_timeout: 2000           # In seconds
+
+  vars_files:
+    - ../vars/precheck-defaults.yml
+    - ../vars/os_depends.yml
+
+  roles:
 
   tasks:
+
+  - name: Windozs Patching - Ensure WinRM starts when the system has settled and is ready to work reliably
+    win_service:
+      name: WinRM
+      start_mode: delayed
+
+  - name: Windozs Patching - Create log directory
+    win_file:
+      state: directory
+      path: "{{ (winupdate_log_path | default(default_log_path)) | win_dirname }}"
+      recursive: true
+
+  - name: Windozs Patching - Install all security, critical, and rollup updates
     win_updates:
+      state: "{{ winupdate_state | default(default_state) }}"
+      server_selection: "{{ winupdate_server_selection | default(default_server_selection) }}"
       category_names: "{{ winupdate_category_names | default(default_category_names) }}"
       whitelist: "{{ winupdate_whitelist | default(default_whitelist) }}"
-    reboot: "{{ winupdate_reboot | default(yes) }}"
-    reboot_timeout: "{{ winupdate_reboot_timeout | default(500) }}"
+      blacklist: "{{ winupdate_blacklist | default(default_blacklist) }}"
+
+      log_path: "{{ winupdate_log_path | default(default_log_path) }}"
+      reboot: "{{ winupdate_reboot | default('yes') }}"
+      reboot_timeout: "{{ winupdate_reboot_timeout | default(default_reboot_timeout) }}"
